@@ -10,7 +10,7 @@ dotenv.config()
 const port = process.env.PORT
 // const index = require('./routes')
 
-__dirname = __dirname.replace(/\\build/, '')
+__dirname = __dirname.replace(/[\\\/]build/, '')
 
 const app = express()
 app.use(cors())
