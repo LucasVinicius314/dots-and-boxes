@@ -4,7 +4,10 @@ import App from './App'
 import { BrowserRouter } from 'react-router-dom'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import dotenv from 'dotenv'
 import reportWebVitals from './reportWebVitals'
+
+dotenv.config()
 
 ReactDOM.render(
   <React.StrictMode>
