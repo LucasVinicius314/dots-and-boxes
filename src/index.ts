@@ -18,8 +18,7 @@ app.use(express.static(path.join(__dirname, 'app/build')))
 // app.use(index)
 
 app.get('/*', function (req, res) {
-  // res.sendFile(path.join(__dirname, 'app/build', 'index.html'))
-  res.send(path.join(__dirname, 'app/build', 'index.html'))
+  res.sendFile(path.join(__dirname, 'app/build', 'index.html'))
 })
 
 const server = http.createServer(app)
