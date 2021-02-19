@@ -7,7 +7,7 @@
     "start": "node index.js",
     "server": "nodemon build/index.js",
     "build": "tsc && cd app && yarn start",
-    "heroku-prebuild": "yarn install && cd app && yarn install",
+    "heroku-prebuild": "yarn install --production=false && cd app && yarn install --production=false",
     "heroku-postbuild": "tsc && cd app && yarn build"
   },
   "dependencies": {
