@@ -1,14 +1,28 @@
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import React from 'react'
+import api from '../api'
 import { models } from '../types/index'
+import { useHistory } from 'react-router'
 
 const Games = () => {
   const [games, setGames] = React.useState<Array<models.Game>>([])
+  const history = useHistory()
 
   React.useEffect(() => {
-    // setGames([{ host: 'a' }])
+    // setGames()
+    api.get('/games')
+      .then(data => {
+        console.log(data)
+        const _games: Array<models.Game> = data.data
+        setGames(_games)
+      })
+      .catch(console.log)
   }, [])
+
+  const navigate = (path: string) => {
+    history.push('/game')
+  }
 
   return (
     <Card>
@@ -16,16 +30,16 @@ const Games = () => {
         <h1>Games</h1>
         <hr />
         {
-          games.map(v => {
+          games.map((v, k) => {
             return (
-              <Card className='my-2'>
+              <Card key={k.toString()} className='my-2'>
                 <Card.Body>
                   <div className='d-flex flex-row justify-content-between'>
                     <div>
                       <h3>Game</h3>
                       <h6>Host: {v.host}</h6>
                     </div>
-                    <Button>Join</Button>
+                    <Button onClick={() => void navigate(`/game?id=${k}`)}>Join</Button>
                   </div>
                 </Card.Body>
               </Card>

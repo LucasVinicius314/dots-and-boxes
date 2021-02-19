@@ -3,11 +3,12 @@ import socketIOClient from 'socket.io-client'
 
 const Game = () => {
   React.useEffect(() => {
-    const socket = socketIOClient.io(`${process.env.REACT_APP_HOST}:${process.env.PORT || 443}`, {
+    const socket = socketIOClient.io(`${process.env.REACT_APP_HOST}:${process.env.PORT || 4001}`, {
       withCredentials: true,
     })
+    alert(`${process.env.REACT_APP_HOST}:${process.env.PORT || 4001}`)
     socket.on('call', () => {
-      alert('con')
+      alert('Test')
     })
   }, [])
 
