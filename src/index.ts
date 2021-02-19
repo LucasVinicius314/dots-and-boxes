@@ -25,7 +25,7 @@ const server = http.createServer(app)
 //@ts-ignore
 const io = socketIo(server, {
   cors: {
-    origin: `${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}`,
+    origin: `${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_PORT}`,
     credentials: true,
   },
 })
