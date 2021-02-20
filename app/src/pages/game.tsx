@@ -15,6 +15,7 @@ const Game = () => {
       query: {
         id: params.id,
         name: name,
+        playerId: sessionStorage.getItem('id') || '',
       },
     })
     socket.on('game info', (data: model.IGame) => {

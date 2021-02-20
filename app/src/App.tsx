@@ -9,8 +9,42 @@ import Game from './pages/game'
 import Header from './components/header'
 import Home from './pages/home'
 import React from 'react'
+import api from './api'
+import { model } from './types/index'
 
 const App = () => {
+  React.useEffect(() => {
+    const effect = async () => {
+      let id = sessionStorage.getItem('id')
+      console.log('player id', id)
+      if (id !== null) {
+        await api.get(`user/verify/${id}`)
+          .then(data => {
+            console.log(data)
+            const response: model.IBindResponse = data.data
+            console.log(response.message)
+          })
+          .catch(error => {
+            console.log(error)
+            id = null
+            sessionStorage.removeItem('id')
+          })
+      }
+      if (id === null) {
+        await api.get('user/bind')
+          .then(data => {
+            console.log(data)
+            const bind: model.IBindQuery = data.data
+            id = bind.id
+            sessionStorage.setItem('id', bind.id)
+            console.log('new player id', id)
+          })
+          .catch(console.log)
+      }
+    }
+    effect()
+  }, [])
+
   return (
     <div>
       <Header />
