@@ -31,7 +31,9 @@ const Game = () => {
       <p><b>ID:</b> {game?.id || 'none'}</p>
       <p><b>Host:</b> {game?.host?.name || 'none'} - {game?.host?.address || 'none'}</p>
       <p><b>Opponent:</b> {game?.opponent?.name || 'none'} - {game?.opponent?.address || 'none'}</p>
-      <p><b>Full:</b> {game?.full ? 'true' : 'false'}</p>
+      {game?.full && (
+        <p className='text-danger'><b>FULL</b></p>
+      )}
     </div>
   )
 }
