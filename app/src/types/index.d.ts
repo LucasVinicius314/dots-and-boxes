@@ -2,7 +2,9 @@
 export namespace models {
   interface Game {
     id: string
-    host: string
+    host: Player
+    opponent: Player
+    full: boolean
   }
 
   interface GameQuery {

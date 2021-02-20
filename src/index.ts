@@ -40,16 +40,29 @@ io.on('connection', (socket: socketIo.Socket) => {
     name: 'Unknown',
   }
   console.log(`New client connected - ${JSON.stringify(player)}`)
-  socket.emit('join', 'true')
   Server.players.push(player)
   const query: models.GameQuery = socket.handshake.query as unknown as models.GameQuery
-  // socket.on('disconnect', () => {
-  //   console.log(`Client disconnected - ${socket.handshake.address}`)
-  // })
+  const foundGame = Server.games.find(f => f.id === query.id)
+  if (foundGame !== undefined) {
+    console.log('game found, joining')
+    if (foundGame.host === undefined) {
+      console.log('host set')
+      foundGame.host = player
+      socket.emit('game info', foundGame)
+    } else if (foundGame.opponent === undefined) {
+      console.log('opponent set')
+      foundGame.opponent = player
+      foundGame.full = true
+      socket.emit('game info', foundGame)
+    } else {
+      console.log('the game is full')
+      socket.emit('game error', 'The game is full')
+    }
+  }
   socket.on('disconnect', () => {
     console.log(`Client disconnected - ${JSON.stringify(player)}`)
   })
-  console.log(Server.players)
+  // console.log(Server.players)
 })
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`))

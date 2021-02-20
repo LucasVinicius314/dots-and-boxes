@@ -16,7 +16,9 @@ router.get('/api/game/create', (req, res) => {
   console.log('game creation')
   const game: models.Game = {
     id: uniqid(),
-    host: 'Unknown',
+    host: undefined,
+    opponent: undefined,
+    full: false,
   }
 
   Server.games.push(game)

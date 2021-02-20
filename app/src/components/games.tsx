@@ -44,15 +44,16 @@ const Games = () => {
         <hr />
         {
           games.map((v, k) => {
+            const host = v.host || { id: '0', name: 'none', address: 'none' }
             return (
               <Card key={k.toString()} className='my-2'>
                 <Card.Body>
                   <div className='d-flex flex-row justify-content-between'>
                     <div>
                       <h3>Game</h3>
-                      <h6>Host: {v.host}</h6>
+                      <h6>Host: {host.address}</h6>
                     </div>
-                    <Button onClick={() => void navigate(`/game/${k}`)}>Join</Button>
+                    <Button onClick={() => void navigate(`/game/${v.id}`)}>Join</Button>
                   </div>
                 </Card.Body>
               </Card>
