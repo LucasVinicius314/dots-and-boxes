@@ -1,22 +1,23 @@
 import React from 'react'
-import { models } from '../types/index'
+import { model } from '../types/index'
 import socketIOClient from 'socket.io-client'
 import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
 const Game = () => {
-  const [game, setGame] = React.useState<models.Game | undefined>(undefined)
+  const [game, setGame] = React.useState<model.IGame | undefined>(undefined)
   const params: { id: string } = useParams()
   const history = useHistory()
   React.useEffect(() => {
-    console.log('ran')
+    const name = prompt('Your name:', 'Unknown') || 'Unknown'
     const socket = socketIOClient.io(`${process.env.REACT_APP_HOST}:${process.env.REACT_APP_API_PORT}`, {
       withCredentials: true,
       query: {
         id: params.id,
+        name: name,
       },
     })
-    socket.on('game info', (data: models.Game) => {
+    socket.on('game info', (data: model.IGame) => {
       console.log('Connected')
       console.log(data)
       setGame(data)

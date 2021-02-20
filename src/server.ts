@@ -1,8 +1,10 @@
-import { models } from '../app/src/types/index'
+import * as Model from './model'
+
+import { model } from '../app/src/types/index'
 
 class Server {
-  static players: Array<models.Player> = []
-  static games: Array<models.Game> = []
+  static players: Array<Model.Player> = []
+  static games: Array<Model.Game> = []
 }
 
 export default Server

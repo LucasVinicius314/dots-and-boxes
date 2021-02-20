@@ -3,8 +3,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "build/",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "isolatedModules": false
   },
+  "strictPropertyInitialization": false,
   "include": [
     "src"
   ],

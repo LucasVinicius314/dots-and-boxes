@@ -1,9 +1,12 @@
+import * as Model from './model'
+
 import Server from './server'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import http from 'http'
-import { models } from '../app/src/types/index'
+import { model } from '../app/src/types/index'
 import path from 'path'
 import routes from './routes'
 import socketIo from 'socket.io'
@@ -17,6 +20,7 @@ __dirname = __dirname.replace(/[\\\/]build/, '')
 
 const app = express()
 app.use(cors())
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'app/build')))
 app.use(routes)
 
@@ -34,59 +38,39 @@ const io = socketIo(server, {
 })
 
 io.on('connection', (socket: socketIo.Socket) => {
-  const player: models.Player = {
+  const query: model.IGameQuery = socket.handshake.query as unknown as model.IGameQuery
+  const player: Model.Player = new Model.Player({
     id: uniqid(),
     address: socket.handshake.address,
-    name: 'Unknown',
+    name: query.name,
     socket: socket,
-  }
-  console.log('New client connected', player)
+  })
+  console.log('new client connected', player)
   Server.players.push(player)
-  const query: models.GameQuery = socket.handshake.query as unknown as models.GameQuery
-  const foundGame = Server.games.find(f => f.id === query.id)
+  const foundGame: Model.Game = Server.games.find(f => f.id === query.id)
   if (foundGame !== undefined) {
     console.log('game found, joining')
     if (foundGame.host === undefined) {
       console.log('host set')
       foundGame.host = player
-      const response: models.Game = {
-        ...foundGame,
-        host: {
-          ...foundGame.host,
-          socket: undefined,
-        },
-        opponent: {
-          ...foundGame.opponent,
-          socket: undefined,
-        },
-      }
-      socket.emit('game info', response)
+      const response: Model.WeakGame = foundGame.toWeak()
+      foundGame.emit('game info', response)
+      console.log(foundGame)
     } else if (foundGame.opponent === undefined) {
       console.log('opponent set')
       foundGame.opponent = player
       foundGame.full = true
-      const response: models.Game = {
-        ...foundGame,
-        host: {
-          ...foundGame.host,
-          socket: undefined,
-        },
-        opponent: {
-          ...foundGame.opponent,
-          socket: undefined,
-        },
-      }
-      socket.emit('game info', response)
-      foundGame.host.socket.emit('game info', response)
+      const response: Model.WeakGame = foundGame.toWeak()
+      foundGame.emit('game info', response)
+      console.log(foundGame)
     } else {
       console.log('the game is full')
       socket.emit('game error', 'The game is full')
     }
   }
   socket.on('disconnect', () => {
-    console.log('Client disconnected', player)
+    console.log('client disconnected', player)
   })
-  // console.log(Server.players)
 })
 
-server.listen(PORT, () => console.log(`Listening on port ${PORT}`))
+server.listen(PORT, () => console.log(`listening on port ${PORT}`))

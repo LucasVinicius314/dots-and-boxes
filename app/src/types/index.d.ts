@@ -2,25 +2,39 @@
 
 import { Socket } from 'socket.io'
 
-export namespace models {
-  interface Game {
-    id: string
-    host: Player
-    opponent: Player
+export namespace model {
+  interface IGame {
     full: boolean
-  }
-
-  interface GameQuery {
+    host: IPlayer
     id: string
-    EIO: string
-    transport: string
-    t: string
+    opponent: IPlayer
   }
 
-  interface Player {
+  interface IWeakGame {
+    full: boolean
+    host: IWeakPlayer
+    id: string
+    opponent: IWeakPlayer
+  }
+
+  interface IGameQuery {
+    EIO: string
     id: string
     name: string
+    t: string
+    transport: string
+  }
+
+  interface IPlayer {
     address: string
-    socket?: Socket
+    id: string
+    name: string
+    socket: Socket
+  }
+
+  interface IWeakPlayer {
+    address: string
+    id: string
+    name: string
   }
 }

@@ -1,9 +1,9 @@
-import { models } from '../app/src/types/index'
+import { model } from '../app/src/types/index'
 
-class GameManager implements models.Game {
+class GameManager implements model.IGame {
   id: string
-  host: models.Player
-  opponent: models.Player
+  host: model.IPlayer
+  opponent: model.IPlayer
   full: boolean
 }
 

@@ -2,11 +2,11 @@ import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import React from 'react'
 import api from '../api'
-import { models } from '../types/index'
+import { model } from '../types/index'
 import { useHistory } from 'react-router'
 
 const Games = () => {
-  const [games, setGames] = React.useState<Array<models.Game>>([])
+  const [games, setGames] = React.useState<Array<model.IGame>>([])
   const [message, setMessage] = React.useState<string | null>('Loading...')
   const history = useHistory()
 
@@ -18,7 +18,7 @@ const Games = () => {
     api.get('/game/create')
       .then(data => {
         console.log(data)
-        const _game: models.Game = data.data
+        const _game: model.IGame = data.data
         history.push(`/game/${_game.id}`)
       })
       .catch(console.log)
@@ -29,7 +29,7 @@ const Games = () => {
     api.get('/games')
       .then(data => {
         console.log(data)
-        const _games: Array<models.Game> = data.data
+        const _games: Array<model.IGame> = data.data
         setGames(_games)
       })
       .catch(console.log)
