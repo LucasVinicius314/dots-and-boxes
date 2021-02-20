@@ -1,11 +1,13 @@
 import React from 'react'
 import { models } from '../types/index'
 import socketIOClient from 'socket.io-client'
+import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
 const Game = () => {
   const [game, setGame] = React.useState<models.Game | undefined>(undefined)
   const params: { id: string } = useParams()
+  const history = useHistory()
   React.useEffect(() => {
     console.log('ran')
     const socket = socketIOClient.io(`${process.env.REACT_APP_HOST}:${process.env.REACT_APP_API_PORT}`, {
@@ -22,11 +24,12 @@ const Game = () => {
     socket.on('game error', (data: string) => {
       console.log(data)
       alert(data)
+      history.goBack()
     })
   }, [])
 
   return (
-    <div>
+    <div className='py-4'>
       <h1>Game</h1>
       <p><b>ID:</b> {game?.id || 'none'}</p>
       <p><b>Host:</b> {game?.host?.name || 'none'} - {game?.host?.address || 'none'}</p>

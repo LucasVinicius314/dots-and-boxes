@@ -7,7 +7,11 @@ const router = express.Router()
 
 router.get('/api/games', (req, res) => {
   console.log('game listing')
-  const games = Server.games
+  const games = Server.games.map(v => ({
+    ...v,
+    host: { ...v.host, socket: undefined },
+    opponent: { ...v.opponent, socket: undefined },
+  }))
 
   res.json(games).status(200)
 })

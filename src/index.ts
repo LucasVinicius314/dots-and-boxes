@@ -38,8 +38,9 @@ io.on('connection', (socket: socketIo.Socket) => {
     id: uniqid(),
     address: socket.handshake.address,
     name: 'Unknown',
+    socket: socket,
   }
-  console.log(`New client connected - ${JSON.stringify(player)}`)
+  console.log('New client connected', player)
   Server.players.push(player)
   const query: models.GameQuery = socket.handshake.query as unknown as models.GameQuery
   const foundGame = Server.games.find(f => f.id === query.id)
@@ -48,19 +49,42 @@ io.on('connection', (socket: socketIo.Socket) => {
     if (foundGame.host === undefined) {
       console.log('host set')
       foundGame.host = player
-      socket.emit('game info', foundGame)
+      const response: models.Game = {
+        ...foundGame,
+        host: {
+          ...foundGame.host,
+          socket: undefined,
+        },
+        opponent: {
+          ...foundGame.opponent,
+          socket: undefined,
+        },
+      }
+      socket.emit('game info', response)
     } else if (foundGame.opponent === undefined) {
       console.log('opponent set')
       foundGame.opponent = player
       foundGame.full = true
-      socket.emit('game info', foundGame)
+      const response: models.Game = {
+        ...foundGame,
+        host: {
+          ...foundGame.host,
+          socket: undefined,
+        },
+        opponent: {
+          ...foundGame.opponent,
+          socket: undefined,
+        },
+      }
+      socket.emit('game info', response)
+      foundGame.host.socket.emit('game info', response)
     } else {
       console.log('the game is full')
       socket.emit('game error', 'The game is full')
     }
   }
   socket.on('disconnect', () => {
-    console.log(`Client disconnected - ${JSON.stringify(player)}`)
+    console.log('Client disconnected', player)
   })
   // console.log(Server.players)
 })
