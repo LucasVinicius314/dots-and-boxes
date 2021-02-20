@@ -1,10 +1,13 @@
+import Server from './server'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import http from 'http'
+import { models } from '../app/src/types/index'
 import path from 'path'
 import routes from './routes'
 import socketIo from 'socket.io'
+import uniqid from 'uniqid'
 
 dotenv.config()
 
@@ -31,11 +34,22 @@ const io = socketIo(server, {
 })
 
 io.on('connection', (socket: socketIo.Socket) => {
-  console.log('New client connected')
-  socket.emit('call', 'test')
+  const player: models.Player = {
+    id: uniqid(),
+    address: socket.handshake.address,
+    name: 'Unknown',
+  }
+  console.log(`New client connected - ${JSON.stringify(player)}`)
+  socket.emit('join', 'true')
+  Server.players.push(player)
+  const query: models.GameQuery = socket.handshake.query as unknown as models.GameQuery
+  // socket.on('disconnect', () => {
+  //   console.log(`Client disconnected - ${socket.handshake.address}`)
+  // })
   socket.on('disconnect', () => {
-    console.log('Client disconnected')
+    console.log(`Client disconnected - ${JSON.stringify(player)}`)
   })
+  console.log(Server.players)
 })
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`))

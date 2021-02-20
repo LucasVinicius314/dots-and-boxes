@@ -21,13 +21,26 @@ const Games = () => {
   }, [])
 
   const navigate = (path: string) => {
-    history.push('/game')
+    history.push(path)
+  }
+
+  const createGame = () => {
+    api.get('/game/create')
+      .then(data => {
+        console.log(data)
+        const _game: models.Game = data.data
+        history.push(`/game/${_game.id}`)
+      })
+      .catch(console.log)
   }
 
   return (
     <Card>
       <Card.Body>
-        <h1>Games</h1>
+        <div className="d-flex flex-row justify-content-between">
+          <h1>Games</h1>
+          <Button onClick={createGame}>Create Game</Button>
+        </div>
         <hr />
         {
           games.map((v, k) => {
@@ -39,7 +52,7 @@ const Games = () => {
                       <h3>Game</h3>
                       <h6>Host: {v.host}</h6>
                     </div>
-                    <Button onClick={() => void navigate(`/game?id=${k}`)}>Join</Button>
+                    <Button onClick={() => void navigate(`/game/${k}`)}>Join</Button>
                   </div>
                 </Card.Body>
               </Card>
