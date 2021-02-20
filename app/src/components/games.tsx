@@ -49,7 +49,7 @@ const Games = () => {
           <h1>Games ({games.length})</h1>
           <div className="d-flex flex-ro">
             <Button onClick={createGame} className='btn-success mx-3'>Create Game</Button>
-            <Button onClick={refresh}>Refresh</Button>
+            <Button disabled={message !== null} onClick={refresh}>Refresh</Button>
           </div>
         </div>
         <p className='text-muted text-center w-100'>{message}</p>
@@ -71,7 +71,7 @@ const Games = () => {
                       )}
                     </div>
                     <div>
-                      <Button onClick={() => void navigate(`/game/${v.id}`)} className='p-4'>Join</Button>
+                      <Button disabled={v.full} onClick={() => void navigate(`/game/${v.id}`)} className='p-4'>Join</Button>
                     </div>
                   </div>
                 </Card.Body>

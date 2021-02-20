@@ -24,7 +24,7 @@ const Game = () => {
     socket.on('game error', (data: string) => {
       console.log(data)
       alert(data)
-      history.goBack()
+      history.push('/')
     })
   }, [])
 
