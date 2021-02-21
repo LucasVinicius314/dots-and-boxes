@@ -1,5 +1,6 @@
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
+import FormControl from 'react-bootstrap/FormControl'
 import React from 'react'
 import api from '../api'
 import { model } from '../types/index'
@@ -8,6 +9,7 @@ import { useHistory } from 'react-router'
 const Games = () => {
   const [games, setGames] = React.useState<Array<model.IGame>>([])
   const [message, setMessage] = React.useState<string | null>('Loading...')
+  const [filter, setFilter] = React.useState<string>('')
   const history = useHistory()
 
   const navigate = (path: string) => {
@@ -42,11 +44,15 @@ const Games = () => {
     refresh()
   }, [])
 
+  const filteredGames = games
+    .filter(f => filter.length === 0 ||
+      `${f.host.name} ${f.id}`.match(new RegExp(filter, 'g')))
+
   return (
     <Card>
       <Card.Body>
         <div className="d-flex flex-row justify-content-between">
-          <h1>Games ({games.length})</h1>
+          <h1>Games ({filteredGames.length})</h1>
           <div className="d-flex flex-ro">
             <Button onClick={createGame} className='btn-success mx-3'>Create Game</Button>
             <Button disabled={message !== null} onClick={refresh}>Refresh</Button>
@@ -54,8 +60,9 @@ const Games = () => {
         </div>
         <p className='text-muted text-center w-100'>{message}</p>
         <hr />
+        <FormControl onChange={event => setFilter(event.target.value)} value={filter} placeholder='Search' className='text-center' />
         {
-          games.map((v, k) => {
+          filteredGames.map((v, k) => {
             const host = v.host || { id: '0', name: 'none', address: 'none' }
             return (
               <Card key={k.toString()} className='my-2'>
@@ -65,7 +72,7 @@ const Games = () => {
                 <Card.Body>
                   <div className='d-flex flex-row justify-content-between'>
                     <div>
-                      <p><b>Host:</b> {host.name} - {host.address}</p>
+                      <p><b>Host:</b> {host.name}</p>
                       {v.full && (
                         <p className='text-danger'><b>FULL</b></p>
                       )}
@@ -79,7 +86,7 @@ const Games = () => {
             )
           })
         }
-        {games.length === 0 && (
+        {filteredGames.length === 0 && (
           <p className='w-100 text-center p-3'>No games found</p>
         )}
       </Card.Body>

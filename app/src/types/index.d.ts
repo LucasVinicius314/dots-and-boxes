@@ -7,11 +7,17 @@ export namespace model {
     message: string
   }
 
+  interface ITile {
+    type: 'vertical' | 'horizontal' | 'box' | 'space'
+    state: 'empty' | 'host' | 'opponent'
+  }
+
   interface IGame {
     full: boolean
     host: IPlayer
     id: string
     opponent: IPlayer
+    tiles?: Array<Array<ITile>>
   }
 
   interface IWeakGame {
@@ -19,6 +25,7 @@ export namespace model {
     host: IWeakPlayer
     id: string
     opponent: IWeakPlayer
+    tiles: Array<Array<ITile>>
   }
 
   interface IVerifyRequest {

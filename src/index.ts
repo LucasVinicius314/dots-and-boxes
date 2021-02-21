@@ -67,7 +67,8 @@ io.on('connection', (socket: socketIo.Socket) => {
       }
     }
   } else {
-    console.log('== not found')
+    console.log('game not found')
+    socket.emit('game error', 'Game not found')
   }
   socket.on('disconnect', () => {
     console.log('client disconnected')
