@@ -53,6 +53,8 @@ router.get('/api/game/create', (req, res) => {
     opponent: undefined,
     height: 4,
     width: 4,
+    status: 'waiting',
+    waitingMove: 'host',
   })
   Server.games.push(game)
   res.status(200).json(game)

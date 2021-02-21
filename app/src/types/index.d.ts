@@ -27,6 +27,8 @@ export namespace model {
     tiles?: Array<Array<ITile>>
     width: number
     height: number
+    status: 'running' | 'waiting'
+    waitingMove: 'host' | 'opponent'
   }
 
   interface IWeakGame {

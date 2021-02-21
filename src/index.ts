@@ -83,11 +83,26 @@ io.on('connection', (socket: socketIo.Socket) => {
         console.log('play - user found')
         if (foundGame.status === 'running') {
           console.log('play - game is runnung')
-          if (true) {
+          const waitedPlayer = foundPlayer.id === foundGame[foundGame.waitingMove]?.id
+          if (waitedPlayer) {
             console.log('play - play made')
-            foundGame.tiles[args.x][args.y].state = 'host'
-            const response: Model.WeakGame = foundGame.toWeak()
-            foundGame.emit('game info', response)
+            const targetTile = foundGame.tiles[args.x][args.y]
+            if (targetTile.state === 'empty') {
+              targetTile.state = foundGame.waitingMove
+              if (foundGame.waitingMove === 'host') {
+                foundGame.waitingMove = 'opponent'
+              } else if (foundGame.waitingMove === 'opponent') {
+                foundGame.waitingMove = 'host'
+              }
+              const response: Model.WeakGame = foundGame.toWeak()
+              foundGame.emit('game info', response)
+            } else {
+              console.log('play - tile is not empty')
+              socket.emit('game message', 'That move was made already')
+            }
+          } else {
+            console.log('play - play from wrong player')
+            socket.emit('game message', 'It\'s not your turn')
           }
         } else {
           console.log('play - game is waiting')

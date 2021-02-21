@@ -62,7 +62,7 @@ class Game implements model.IGame {
   width: number
   height: number
   status: 'running' | 'waiting'
-  waitingMove: 'none' | 'host' | 'opponent'
+  waitingMove: 'host' | 'opponent'
 
   constructor(params: model.IGame) {
     this.full = params.full
@@ -72,6 +72,7 @@ class Game implements model.IGame {
     this.height = params.height
     this.width = params.width
     this.status = 'waiting'
+    this.waitingMove = 'host'
     const even = (v, k) => k % 2 === 0 ? new Tile({ type: 'box', state: 'empty' }) : new Tile({ type: 'vertical', state: 'empty' })
     const odd = (v, k) => k % 2 === 0 ? new Tile({ type: 'horizontal', state: 'empty' }) : new Tile({ type: 'space', state: 'empty' })
     this.tiles = new Array((this.height * 2) - 1).fill(true)
@@ -85,7 +86,9 @@ class Game implements model.IGame {
       host: this.host?.toWeak() || WeakPlayer.empty,
       id: this.id,
       opponent: this.opponent?.toWeak() || WeakPlayer.empty,
-      tiles: this.tiles
+      tiles: this.tiles,
+      status: this.status,
+      waitingMove: this.waitingMove,
     })
   }
 
@@ -102,6 +105,8 @@ class WeakGame implements model.IWeakGame {
   id: string
   opponent: WeakPlayer
   tiles: Array<Array<Tile>>
+  status: 'running' | 'waiting'
+  waitingMove: 'host' | 'opponent'
 
   constructor(params: WeakGame) {
     this.full = params.full
@@ -109,6 +114,8 @@ class WeakGame implements model.IWeakGame {
     this.id = params.id
     this.opponent = params.opponent
     this.tiles = params.tiles
+    this.status = params.status
+    this.waitingMove = params.waitingMove
   }
 }
 

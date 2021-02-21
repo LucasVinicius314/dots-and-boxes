@@ -4,6 +4,12 @@ import socketIOClient from 'socket.io-client'
 import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
 
+const colors = {
+  blue: '#449',
+  gray: '#eee',
+  red: '#944',
+}
+
 const Game = () => {
   const [game, setGame] = React.useState<model.IGame | undefined>(undefined)
   const params: { id: string } = useParams()
@@ -50,11 +56,11 @@ const Game = () => {
   const color = (_state: 'empty' | 'host' | 'opponent') => {
     switch (_state) {
       case 'empty':
-        return '#ddd'
+        return colors.gray
       case 'host':
-        return '#944'
+        return colors.red
       case 'opponent':
-        return '#449'
+        return colors.blue
     }
   }
 
@@ -70,13 +76,24 @@ const Game = () => {
     <div className='py-4'>
       <h1>Game</h1>
       <p><b>ID:</b> {game?.id || 'none'}</p>
-      <p><b>Host:</b> {game?.host?.name || 'none'}</p>
-      <p><b>Opponent:</b> {game?.opponent?.name || 'none'}</p>
+      <p style={{ color: colors.red }}><b>Host:</b> {game?.host?.name || 'none'}</p>
+      <p style={{ color: colors.blue }}><b>Opponent:</b> {game?.opponent?.name || 'none'}</p>
       {game?.full && (
         <p className='text-danger'><b>FULL</b></p>
       )}
       <hr />
-      <div className="d-flex justify-content-center align-items-center p-3">
+      <div className="d-flex flex-column justify-content-center align-items-center p-3">
+        <div className='mb-4'>
+        {game?.status === 'running' ? (
+          game?.waitingMove === 'host' ? (
+            <h2 style={{ color: colors.red }}>Host's turn</h2>
+          ) : (
+            <h2 style={{ color: colors.blue }}>Opponent's turn</h2>
+          )
+        ) : (
+          <h2>Waiting for an opponent to join</h2>
+        )}
+        </div>
         <div style={{
           width: width * boxSize + (width + 1) * spaceSize,
           height: height * boxSize + (height + 1) * spaceSize,
@@ -95,7 +112,7 @@ const Game = () => {
                   case 'vertical':
                     return <div onClick={() => send(k, k2)} style={{ width: spaceSize, height: boxSize, backgroundColor: color(v2.state) }}></div>
                   case 'space':
-                    return <div style={{ width: spaceSize, height: spaceSize }}></div>
+                    return <div style={{ width: spaceSize, height: spaceSize, backgroundColor: '#555' }}></div>
                 }
               })}
             </div>
