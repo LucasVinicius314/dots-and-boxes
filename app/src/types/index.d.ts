@@ -3,6 +3,13 @@
 import { Socket } from 'socket.io'
 
 export namespace model {
+  interface IPlayArgs {
+    playerId: string
+    gameId: string
+    x: number
+    y: number
+  }
+
   interface IRequest {
     message: string
   }
@@ -18,6 +25,8 @@ export namespace model {
     id: string
     opponent: IPlayer
     tiles?: Array<Array<ITile>>
+    width: number
+    height: number
   }
 
   interface IWeakGame {

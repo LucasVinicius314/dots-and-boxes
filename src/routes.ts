@@ -51,6 +51,8 @@ router.get('/api/game/create', (req, res) => {
     host: undefined,
     id: uniqid(),
     opponent: undefined,
+    height: 4,
+    width: 4,
   })
   Server.games.push(game)
   res.status(200).json(game)

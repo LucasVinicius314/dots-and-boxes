@@ -59,27 +59,24 @@ class Game implements model.IGame {
   id: string
   opponent: Player
   tiles: Array<Array<Tile>>
+  width: number
+  height: number
+  status: 'running' | 'waiting'
+  waitingMove: 'none' | 'host' | 'opponent'
 
   constructor(params: model.IGame) {
     this.full = params.full
     this.host = params.host as Player
     this.id = params.id
     this.opponent = params.opponent as Player
-    const height = 3
-    const width = 4
+    this.height = params.height
+    this.width = params.width
+    this.status = 'waiting'
     const even = (v, k) => k % 2 === 0 ? new Tile({ type: 'box', state: 'empty' }) : new Tile({ type: 'vertical', state: 'empty' })
     const odd = (v, k) => k % 2 === 0 ? new Tile({ type: 'horizontal', state: 'empty' }) : new Tile({ type: 'space', state: 'empty' })
-    this.tiles = new Array((height * 2) - 1).fill(true)
-      .map((v, k) => new Array((width * 2) - 1).fill(true)
+    this.tiles = new Array((this.height * 2) - 1).fill(true)
+      .map((v, k) => new Array((this.width * 2) - 1).fill(true)
         .map(k % 2 === 0 ? even : odd))
-    /* (() => {
-      const height = 3
-      const width = 4
-      const even = (v, k) => k % 2 === 0 ? ' ' : '|'
-      const odd = (v, k) => k % 2 === 0 ? '-' : '+'
-      const tiles = new Array((height * 2) - 1).fill(true).map((v, k) => new Array((width * 2) - 1).fill(true).map(k % 2 === 0 ? even : odd))
-      console.log(tiles)
-    })() */
   }
 
   toWeak(): WeakGame {

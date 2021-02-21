@@ -30,7 +30,7 @@ app.get('/*', function (req, res) {
 
 const server = http.createServer(app)
 //@ts-ignore
-const io = socketIo(server, {
+const io: socketIo.Socket = socketIo(server, {
   cors: {
     origin: `${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_PORT}`,
     credentials: true,
@@ -58,6 +58,8 @@ io.on('connection', (socket: socketIo.Socket) => {
         console.log('opponent set')
         foundGame.opponent = foundPlayer
         foundGame.full = true
+        foundGame.status = 'running'
+        foundGame.waitingMove = 'host'
         const response: Model.WeakGame = foundGame.toWeak()
         foundGame.emit('game info', response)
         console.log(foundGame)
@@ -70,6 +72,36 @@ io.on('connection', (socket: socketIo.Socket) => {
     console.log('game not found')
     socket.emit('game error', 'Game not found')
   }
+  socket.on('play', (args: model.IPlayArgs) => {
+    console.log('play')
+    console.log(args)
+    const foundGame = Server.games.find(f => f.id === args.gameId)
+    if (foundGame !== undefined) {
+      console.log('play - game found')
+      const foundPlayer = [foundGame.host, foundGame.opponent].find(f => f.id === args.playerId)
+      if (foundPlayer !== undefined) {
+        console.log('play - user found')
+        if (foundGame.status === 'running') {
+          console.log('play - game is runnung')
+          if (true) {
+            console.log('play - play made')
+            foundGame.tiles[args.x][args.y].state = 'host'
+            const response: Model.WeakGame = foundGame.toWeak()
+            foundGame.emit('game info', response)
+          }
+        } else {
+          console.log('play - game is waiting')
+          socket.emit('game message', 'The game is waiting to start')
+        }
+      } else {
+        console.log('play - user not found')
+        socket.emit('game message', 'Your user is invalid')
+      }
+    } else {
+      console.log('play - game not found')
+      socket.emit('game message', 'The game ended or wasn\'t found')
+    }
+  })
   socket.on('disconnect', () => {
     console.log('client disconnected')
   })
