@@ -4,7 +4,10 @@
     "module": "commonjs",
     "outDir": "build/",
     "esModuleInterop": true,
-    "isolatedModules": false
+    "isolatedModules": false,
+    "lib": [
+      "ES2019"
+    ]
   },
   "strictPropertyInitialization": false,
   "include": [

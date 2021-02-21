@@ -61,7 +61,7 @@ class Game implements model.IGame {
   tiles: Array<Array<Tile>>
   width: number
   height: number
-  status: 'running' | 'waiting'
+  status: 'running' | 'waiting' | 'over'
   waitingMove: 'host' | 'opponent'
 
   constructor(params: model.IGame) {
@@ -89,6 +89,8 @@ class Game implements model.IGame {
       tiles: this.tiles,
       status: this.status,
       waitingMove: this.waitingMove,
+      width: this.width,
+      height: this.height,
     })
   }
 
@@ -96,6 +98,43 @@ class Game implements model.IGame {
     const host = this.host?.socket.emit(ev, ...args)
     const opponent = this.opponent?.socket.emit(ev, ...args)
     return host && opponent
+  }
+
+  check(): { over: boolean, message?: string } {
+    console.log('check')
+    const player = this.waitingMove
+    let boxMade = false
+    this.tiles.forEach((v, k) => {
+      v.forEach((v2, k2) => {
+        if (v2.type !== 'box' || v2.state !== 'empty') return
+        const topCheck = k === 0 || this.tiles[k - 1][k2].state !== 'empty'
+        const bottomCheck = k === (this.height * 2) - 2 || this.tiles[k + 1][k2].state !== 'empty'
+        const leftCheck = k2 === 0 || this.tiles[k][k2 - 1].state !== 'empty'
+        const rightCheck = k2 === (this.width * 2) - 2 || this.tiles[k][k2 + 1].state !== 'empty'
+        if (topCheck && bottomCheck && leftCheck && rightCheck) {
+          boxMade = true
+          this.tiles[k][k2].state = player
+        }
+      })
+    })
+    if (boxMade) {
+      if (player === 'host') {
+        this.waitingMove = 'opponent'
+      } else if (player === 'opponent') {
+        this.waitingMove = 'host'
+      }
+    }
+    const boxes = this.tiles.flat()
+    if (boxes.filter(f => f.state === 'empty' && f.type === 'box').length === 0) {
+      this.status = 'over'
+      const hostCount = boxes.filter(f => f.state === 'host' && f.type === 'box')
+      const opponentCount = boxes.filter(f => f.state === 'opponent' && f.type === 'box')
+      const winnerMessage = hostCount === opponentCount ?
+        'Draw!' : `${this[hostCount > opponentCount ? 'host' : 'opponent'].name} wins!`
+      return { over: true, message: winnerMessage }
+    } else {
+      return { over: false }
+    }
   }
 }
 
@@ -105,8 +144,10 @@ class WeakGame implements model.IWeakGame {
   id: string
   opponent: WeakPlayer
   tiles: Array<Array<Tile>>
-  status: 'running' | 'waiting'
+  status: 'running' | 'waiting' | 'over'
   waitingMove: 'host' | 'opponent'
+  width: number
+  height: number
 
   constructor(params: WeakGame) {
     this.full = params.full
@@ -116,6 +157,8 @@ class WeakGame implements model.IWeakGame {
     this.tiles = params.tiles
     this.status = params.status
     this.waitingMove = params.waitingMove
+    this.width = params.width
+    this.height = params.height
   }
 }
 

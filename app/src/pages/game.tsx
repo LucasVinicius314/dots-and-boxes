@@ -8,6 +8,9 @@ const colors = {
   blue: '#449',
   gray: '#eee',
   red: '#944',
+  lightBlue: '#99e',
+  lightRed: '#e99',
+  white: '#fff',
 }
 
 const Game = () => {
@@ -15,6 +18,7 @@ const Game = () => {
   const params: { id: string } = useParams()
   const history = useHistory()
   const [socket, setSocket] = React.useState<socketIOClient.Socket | undefined>(undefined)
+  const [message, setMessage] = React.useState<string>('')
 
   React.useEffect(() => {
     const name = prompt('Your name:', 'Unknown') || 'Unknown'
@@ -33,7 +37,7 @@ const Game = () => {
     })
     _socket.on('game message', (data: string) => {
       console.log(data)
-      alert(data)
+      setMessage(data)
     })
     _socket.on('game error', (data: string) => {
       console.log(data)
@@ -53,7 +57,7 @@ const Game = () => {
     socket?.emit('play', args)
   }
 
-  const color = (_state: 'empty' | 'host' | 'opponent') => {
+  const lineColor = (_state: 'empty' | 'host' | 'opponent') => {
     switch (_state) {
       case 'empty':
         return colors.gray
@@ -64,8 +68,19 @@ const Game = () => {
     }
   }
 
-  const height = game?.height || 4
-  const width = game?.width || 4
+  const boxColor = (_state: 'empty' | 'host' | 'opponent') => {
+    switch (_state) {
+      case 'empty':
+        return colors.white
+      case 'host':
+        return colors.lightRed
+      case 'opponent':
+        return colors.lightBlue
+    }
+  }
+
+  const height = game?.height || 0
+  const width = game?.width || 0
 
   const boxSize = 40
   const spaceSize = 10
@@ -83,16 +98,18 @@ const Game = () => {
       )}
       <hr />
       <div className="d-flex flex-column justify-content-center align-items-center p-3">
-        <div className='mb-4'>
-        {game?.status === 'running' ? (
-          game?.waitingMove === 'host' ? (
-            <h2 style={{ color: colors.red }}>Host's turn</h2>
-          ) : (
-            <h2 style={{ color: colors.blue }}>Opponent's turn</h2>
-          )
-        ) : (
-          <h2>Waiting for an opponent to join</h2>
-        )}
+        <div className='align-items-center mb-4'>
+          {game?.status === 'running' && (
+            <h2 className='text-center' style={{ color: game?.waitingMove === 'host' ? colors.red : colors.blue }}>
+              {game[game.waitingMove].name}'s turn
+            </h2>
+          )}
+          {game?.status === 'waiting' && (
+            <h2 className='text-center'>Waiting for an opponent to join</h2>
+          )}
+          {true && (
+            <h2 className='text-center'>{message}</h2>
+          )}
         </div>
         <div style={{
           width: width * boxSize + (width + 1) * spaceSize,
@@ -104,22 +121,23 @@ const Game = () => {
           {tiles?.map((v, k) => (
             <div key={k} className='d-flex flex-row'>
               {v.map((v2, k2) => {
+                const key = k2 + k * v.length
                 switch (v2.type) {
                   case 'box':
-                    return <div style={{ width: boxSize, height: boxSize }}></div>
+                    return <div key={key} style={{ width: boxSize, height: boxSize, backgroundColor: boxColor(v2.state) }}></div>
                   case 'horizontal':
-                    return <div onClick={() => send(k, k2)} style={{ width: boxSize, height: spaceSize, backgroundColor: color(v2.state) }}></div>
+                    return <div key={key} onClick={() => send(k, k2)} style={{ width: boxSize, height: spaceSize, backgroundColor: lineColor(v2.state) }}></div>
                   case 'vertical':
-                    return <div onClick={() => send(k, k2)} style={{ width: spaceSize, height: boxSize, backgroundColor: color(v2.state) }}></div>
+                    return <div key={key} onClick={() => send(k, k2)} style={{ width: spaceSize, height: boxSize, backgroundColor: lineColor(v2.state) }}></div>
                   case 'space':
-                    return <div style={{ width: spaceSize, height: spaceSize, backgroundColor: '#555' }}></div>
+                    return <div key={key} style={{ width: spaceSize, height: spaceSize, backgroundColor: '#555' }}></div>
                 }
               })}
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

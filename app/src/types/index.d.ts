@@ -27,7 +27,7 @@ export namespace model {
     tiles?: Array<Array<ITile>>
     width: number
     height: number
-    status: 'running' | 'waiting'
+    status: 'running' | 'waiting' | 'over'
     waitingMove: 'host' | 'opponent'
   }
 

@@ -89,13 +89,19 @@ io.on('connection', (socket: socketIo.Socket) => {
             const targetTile = foundGame.tiles[args.x][args.y]
             if (targetTile.state === 'empty') {
               targetTile.state = foundGame.waitingMove
-              if (foundGame.waitingMove === 'host') {
-                foundGame.waitingMove = 'opponent'
-              } else if (foundGame.waitingMove === 'opponent') {
-                foundGame.waitingMove = 'host'
-              }
+              const check = foundGame.check()
               const response: Model.WeakGame = foundGame.toWeak()
-              foundGame.emit('game info', response)
+              if (check.over) {
+                foundGame.emit('game info', response)
+                foundGame.emit('game message', check.message)
+              } else {
+                if (foundGame.waitingMove === 'host') {
+                  foundGame.waitingMove = 'opponent'
+                } else if (foundGame.waitingMove === 'opponent') {
+                  foundGame.waitingMove = 'host'
+                }
+                foundGame.emit('game info', response)
+              }
             } else {
               console.log('play - tile is not empty')
               socket.emit('game message', 'That move was made already')

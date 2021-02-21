@@ -46,13 +46,14 @@ router.get('/api/games', (req, res) => {
 
 router.get('/api/game/create', (req, res) => {
   console.log('game creation')
+  const size = 4 + Math.ceil(Math.random() * 3) * 2
   const game: Model.Game = new Model.Game({
     full: false,
     host: undefined,
     id: uniqid(),
     opponent: undefined,
-    height: 4,
-    width: 4,
+    height: size,
+    width: size,
     status: 'waiting',
     waitingMove: 'host',
   })
