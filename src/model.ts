@@ -37,7 +37,7 @@ class WeakPlayer implements model.IWeakPlayer {
   static empty: WeakPlayer = {
     address: 'none',
     id: '0',
-    name: 'none'
+    name: 'none',
   }
 }
 
@@ -73,11 +73,19 @@ class Game implements model.IGame {
     this.width = params.width
     this.status = 'waiting'
     this.waitingMove = 'host'
-    const even = (v, k) => k % 2 === 0 ? new Tile({ type: 'box', state: 'empty' }) : new Tile({ type: 'vertical', state: 'empty' })
-    const odd = (v, k) => k % 2 === 0 ? new Tile({ type: 'horizontal', state: 'empty' }) : new Tile({ type: 'space', state: 'empty' })
-    this.tiles = new Array((this.height * 2) - 1).fill(true)
-      .map((v, k) => new Array((this.width * 2) - 1).fill(true)
-        .map(k % 2 === 0 ? even : odd))
+    const even = (v, k: number) =>
+      k % 2 === 0
+        ? new Tile({ type: 'box', state: 'empty' })
+        : new Tile({ type: 'vertical', state: 'empty' })
+    const odd = (v, k: number) =>
+      k % 2 === 0
+        ? new Tile({ type: 'horizontal', state: 'empty' })
+        : new Tile({ type: 'space', state: 'empty' })
+    this.tiles = new Array(this.height * 2 - 1)
+      .fill(true)
+      .map((v, k) =>
+        new Array(this.width * 2 - 1).fill(true).map(k % 2 === 0 ? even : odd)
+      )
   }
 
   toWeak(): WeakGame {
@@ -100,7 +108,7 @@ class Game implements model.IGame {
     return host && opponent
   }
 
-  check(): { over: boolean, message?: string } {
+  check(): { over: boolean; message?: string } {
     console.log('check')
     const player = this.waitingMove
     let boxMade = false
@@ -108,9 +116,11 @@ class Game implements model.IGame {
       v.forEach((v2, k2) => {
         if (v2.type !== 'box' || v2.state !== 'empty') return
         const topCheck = k === 0 || this.tiles[k - 1][k2].state !== 'empty'
-        const bottomCheck = k === (this.height * 2) - 2 || this.tiles[k + 1][k2].state !== 'empty'
+        const bottomCheck =
+          k === this.height * 2 - 2 || this.tiles[k + 1][k2].state !== 'empty'
         const leftCheck = k2 === 0 || this.tiles[k][k2 - 1].state !== 'empty'
-        const rightCheck = k2 === (this.width * 2) - 2 || this.tiles[k][k2 + 1].state !== 'empty'
+        const rightCheck =
+          k2 === this.width * 2 - 2 || this.tiles[k][k2 + 1].state !== 'empty'
         if (topCheck && bottomCheck && leftCheck && rightCheck) {
           boxMade = true
           this.tiles[k][k2].state = player
@@ -125,12 +135,22 @@ class Game implements model.IGame {
       }
     }
     const boxes = this.tiles.flat()
-    if (boxes.filter(f => f.state === 'empty' && f.type === 'box').length === 0) {
+    if (
+      boxes.filter((f) => f.state === 'empty' && f.type === 'box').length === 0
+    ) {
       this.status = 'over'
-      const hostCount = boxes.filter(f => f.state === 'host' && f.type === 'box')
-      const opponentCount = boxes.filter(f => f.state === 'opponent' && f.type === 'box')
-      const winnerMessage = hostCount === opponentCount ?
-        'Draw!' : `${this[hostCount > opponentCount ? 'host' : 'opponent'].name} wins!`
+      const hostCount = boxes.filter(
+        (f) => f.state === 'host' && f.type === 'box'
+      )
+      const opponentCount = boxes.filter(
+        (f) => f.state === 'opponent' && f.type === 'box'
+      )
+      const winnerMessage =
+        hostCount === opponentCount
+          ? 'Draw!'
+          : `${
+              this[hostCount > opponentCount ? 'host' : 'opponent'].name
+            } wins!`
       return { over: true, message: winnerMessage }
     } else {
       return { over: false }
@@ -162,9 +182,4 @@ class WeakGame implements model.IWeakGame {
   }
 }
 
-export {
-  Player,
-  WeakPlayer,
-  Game,
-  WeakGame,
-}
+export { Player, WeakPlayer, Game, WeakGame }

@@ -1,24 +1,21 @@
+import 'dotenv/config'
+
 import * as Model from './model'
 
 import Server from './server'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express from 'express'
 import http from 'http'
 import { model } from '../app/src/types/index'
 import path from 'path'
 import routes from './routes'
 import socketIo from 'socket.io'
-import uniqid from 'uniqid'
-
-dotenv.config()
-
-const PORT = process.env.PORT
 
 __dirname = __dirname.replace(/[\\\/]build/, '')
 
 const app = express()
+
 app.use(cors())
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'app/build')))
@@ -39,13 +36,14 @@ const io: socketIo.Socket = socketIo(server, {
 
 io.on('connection', (socket: socketIo.Socket) => {
   console.log('new client connected')
-  const query: model.IGameQuery = socket.handshake.query as unknown as model.IGameQuery
-  const foundPlayer = Server.players.find(f => f.id === query.playerId)
+  const query: model.IGameQuery = (socket.handshake
+    .query as unknown) as model.IGameQuery
+  const foundPlayer = Server.players.find((f) => f.id === query.playerId)
   if (foundPlayer !== undefined) {
     foundPlayer.address = socket.handshake.address
     foundPlayer.name = query.name
     foundPlayer.socket = socket
-    const foundGame: Model.Game = Server.games.find(f => f.id === query.id)
+    const foundGame: Model.Game = Server.games.find((f) => f.id === query.id)
     if (foundGame !== undefined) {
       console.log('game found, joining')
       if (foundGame.host === undefined) {
@@ -75,15 +73,18 @@ io.on('connection', (socket: socketIo.Socket) => {
   socket.on('play', (args: model.IPlayArgs) => {
     console.log('play')
     console.log(args)
-    const foundGame = Server.games.find(f => f.id === args.gameId)
+    const foundGame = Server.games.find((f) => f.id === args.gameId)
     if (foundGame !== undefined) {
       console.log('play - game found')
-      const foundPlayer = [foundGame.host, foundGame.opponent].find(f => f.id === args.playerId)
+      const foundPlayer = [foundGame.host, foundGame.opponent].find(
+        (f) => f.id === args.playerId
+      )
       if (foundPlayer !== undefined) {
         console.log('play - user found')
         if (foundGame.status === 'running') {
           console.log('play - game is runnung')
-          const waitedPlayer = foundPlayer.id === foundGame[foundGame.waitingMove]?.id
+          const waitedPlayer =
+            foundPlayer.id === foundGame[foundGame.waitingMove]?.id
           if (waitedPlayer) {
             console.log('play - play made')
             const targetTile = foundGame.tiles[args.x][args.y]
@@ -108,7 +109,7 @@ io.on('connection', (socket: socketIo.Socket) => {
             }
           } else {
             console.log('play - play from wrong player')
-            socket.emit('game message', 'It\'s not your turn')
+            socket.emit('game message', "It's not your turn")
           }
         } else {
           console.log('play - game is waiting')
@@ -120,7 +121,7 @@ io.on('connection', (socket: socketIo.Socket) => {
       }
     } else {
       console.log('play - game not found')
-      socket.emit('game message', 'The game ended or wasn\'t found')
+      socket.emit('game message', "The game ended or wasn't found")
     }
   })
   socket.on('disconnect', () => {
@@ -128,4 +129,6 @@ io.on('connection', (socket: socketIo.Socket) => {
   })
 })
 
-server.listen(PORT, () => console.log(`listening on port ${PORT}`))
+server.listen(process.env.PORT, () => {
+  console.log(`listening on port ${process.env.PORT}`)
+})

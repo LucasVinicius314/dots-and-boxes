@@ -2,7 +2,7 @@ import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import React from 'react'
 
-const Header = () => {
+export const Header = () => {
   return (
     <Navbar bg="light" expand="lg">
       <Navbar.Brand href="#home">Dots and Boxes</Navbar.Brand>
@@ -16,5 +16,3 @@ const Header = () => {
     </Navbar>
   )
 }
-
-export default Header
